@@ -6,6 +6,7 @@ import { type Request, type Response } from "express";
 import { approveAll, type CopilotSession } from "@github/copilot-sdk";
 import { getClient } from "../copilot.js";
 import { isImageCompressEnabled, compressImage } from "../imageUtils.js";
+import { log } from "../logger.js";
 import type {
   ChatCompletionRequest,
   ChatCompletionResponse,
@@ -58,6 +59,7 @@ const MIME_TO_EXT: Record<string, string> = {
  * Returns the path to the temp file.
  */
 async function downloadImageToTempFile(url: string): Promise<string> {
+  log(`Downloading image: ${url}`);
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Failed to fetch image from ${url}: ${response.status} ${response.statusText}`);
@@ -67,6 +69,7 @@ async function downloadImageToTempFile(url: string): Promise<string> {
   const tmpPath = join(tmpdir(), `copilot-img-${randomUUID()}.${ext}`);
   const buffer = await response.arrayBuffer();
   await writeFile(tmpPath, Buffer.from(buffer));
+  log(`Image downloaded: ${url} -> ${tmpPath} (${buffer.byteLength} bytes, type: ${contentType})`);
   return tmpPath;
 }
 
@@ -121,6 +124,8 @@ export async function chatCompletionsHandler(
   res: Response
 ): Promise<void> {
   const body = req.body as ChatCompletionRequest;
+
+  log(`POST /v1/chat/completions model=${body.model ?? "(none)"} stream=${body.stream ?? false} messages=${Array.isArray(body.messages) ? body.messages.length : 0}`);
 
   if (!body.messages || !Array.isArray(body.messages)) {
     const err: ErrorResponse = {

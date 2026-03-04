@@ -1,6 +1,7 @@
 import { type Request, type Response } from "express";
 import { listModels } from "../copilot.js";
 import type { ModelsListResponse, ErrorResponse } from "../types/openai.js";
+import { log } from "../logger.js";
 
 /**
  * GET /v1/models
@@ -10,8 +11,10 @@ export async function modelsHandler(
   _req: Request,
   res: Response
 ): Promise<void> {
+  log("GET /v1/models");
   try {
     const models = await listModels();
+    log(`Models listed: ${models.map((m) => m.id).join(", ")}`);
 
     const response: ModelsListResponse = {
       object: "list",
