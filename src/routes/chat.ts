@@ -1,10 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { writeFile, unlink } from "node:fs/promises";
 import { type Request, type Response } from "express";
 import { approveAll, type CopilotSession } from "@github/copilot-sdk";
-import { getClient } from "../copilot.js";
+import { getClient, getTempDir } from "../copilot.js";
 import { isImageCompressEnabled, compressImage } from "../imageUtils.js";
 import { log } from "../logger.js";
 import type {
@@ -66,7 +65,7 @@ async function downloadImageToTempFile(url: string): Promise<string> {
   }
   const contentType = (response.headers.get("content-type") ?? "image/jpeg").split(";")[0].trim();
   const ext = MIME_TO_EXT[contentType] ?? "jpg";
-  const tmpPath = join(tmpdir(), `copilot-img-${randomUUID()}.${ext}`);
+  const tmpPath = join(await getTempDir(), `copilot-img-${randomUUID()}.${ext}`);
   const buffer = await response.arrayBuffer();
   await writeFile(tmpPath, Buffer.from(buffer));
   log(`Image downloaded: ${url} -> ${tmpPath} (${buffer.byteLength} bytes, type: ${contentType})`);
