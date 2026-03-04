@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import { log } from "./logger.js";
 
 /**
  * Whether image compression is enabled.
@@ -45,6 +46,7 @@ export async function compressImage(
 
   // Only resize if the image exceeds the maximum dimension.
   if (width > maxSize || height > maxSize) {
+    log(`Compressing image: ${filePath} (${width}x${height} -> max ${maxSize}px, format: ${format ?? "unknown"})`);
     const resized = image.resize({
       width: maxSize,
       height: maxSize,
@@ -78,5 +80,6 @@ export async function compressImage(
     const buffer = await pipeline.toBuffer();
     const { writeFile } = await import("node:fs/promises");
     await writeFile(filePath, buffer);
+    log(`Image compressed: ${filePath} (${buffer.byteLength} bytes)`);
   }
 }
