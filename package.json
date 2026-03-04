@@ -24,11 +24,13 @@
   "license": "MIT",
   "dependencies": {
     "@github/copilot-sdk": "^0.1.8",
-    "express": "^5.0.1"
+    "express": "^5.0.1",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@types/express": "^5.0.2",
     "@types/node": "^22.0.0",
+    "@types/sharp": "^0.31.1",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.0.0",

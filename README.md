@@ -33,6 +33,17 @@ Set one of the following environment variables to authenticate with GitHub:
 
 If none of these are set the SDK falls back to the stored credentials from `gh auth login` or `copilot auth login`.
 
+### Image Compression
+
+When images are included in chat messages, they are downloaded to a temporary local file before being sent to the Copilot session. The following options control whether those images are compressed first:
+
+| Variable | Description |
+|---|---|
+| `IMAGE_COMPRESS_ENABLED` | Enable image compression before upload (default: `true`). Set to `false` or `0` to disable. |
+| `IMAGE_COMPRESS_MAX_SIZE` | Maximum width or height in pixels after resizing (default: `1920`). The image is resized proportionally so neither dimension exceeds this value. |
+
+Image compression uses [sharp](https://sharp.pixelplumbing.com/), which works on Windows, Linux, and macOS.
+
 ## Running the Server
 
 ```bash

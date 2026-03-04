@@ -5,6 +5,7 @@ import { writeFile, unlink } from "node:fs/promises";
 import { type Request, type Response } from "express";
 import { approveAll, type CopilotSession } from "@github/copilot-sdk";
 import { getClient } from "../copilot.js";
+import { isImageCompressEnabled, compressImage } from "../imageUtils.js";
 import type {
   ChatCompletionRequest,
   ChatCompletionResponse,
@@ -167,9 +168,13 @@ export async function chatCompletionsHandler(
   const tempFiles: string[] = [];
   let attachments: Array<{ type: "file"; path: string; displayName: string }> = [];
   try {
+    const compressEnabled = isImageCompressEnabled();
     for (const url of imageUrls) {
       const tmpPath = await downloadImageToTempFile(url);
       tempFiles.push(tmpPath);
+      if (compressEnabled) {
+        await compressImage(tmpPath);
+      }
       attachments.push({ type: "file", path: tmpPath, displayName: new URL(url).pathname.split("/").pop() ?? "image" });
     }
   } catch (err) {
